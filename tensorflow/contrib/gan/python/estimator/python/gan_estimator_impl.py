@@ -221,14 +221,17 @@ def _get_estimator_spec(
     get_hooks_fn=None, use_loss_summaries=True, is_chief=True):
   """Get the EstimatorSpec for the current mode."""
   if mode == model_fn_lib.ModeKeys.PREDICT:
+    predictions = gan_model.generator_inputs
+    predictions["generated_data"] = gan_model.generated_data
     estimator_spec = model_fn_lib.EstimatorSpec(
-        mode=mode, predictions=gan_model.generated_data)
+        mode=mode, predictions=predictions)
   else:
-    gan_loss = tfgan_tuples.GANLoss(
-        generator_loss=generator_loss_fn(
-            gan_model, add_summaries=use_loss_summaries),
-        discriminator_loss=discriminator_loss_fn(
-            gan_model, add_summaries=use_loss_summaries))
+    gan_loss = tfgan_train.gan_loss(
+          gan_model,
+          generator_loss_fn=generator_loss_fn,
+          discriminator_loss_fn=discriminator_loss_fn,
+          gradient_penalty_weight=1.0,
+          add_summaries=use_loss_summaries))
     if mode == model_fn_lib.ModeKeys.EVAL:
       estimator_spec = _get_eval_estimator_spec(
           gan_model, gan_loss, get_eval_metric_ops_fn)
