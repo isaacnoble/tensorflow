@@ -231,7 +231,7 @@ def _get_estimator_spec(
           generator_loss_fn=generator_loss_fn,
           discriminator_loss_fn=discriminator_loss_fn,
           gradient_penalty_weight=1.0,
-          add_summaries=use_loss_summaries))
+          add_summaries=use_loss_summaries)
     if mode == model_fn_lib.ModeKeys.EVAL:
       estimator_spec = _get_eval_estimator_spec(
           gan_model, gan_loss, get_eval_metric_ops_fn)
